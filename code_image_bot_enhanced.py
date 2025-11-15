@@ -22,12 +22,18 @@ from telegram.ext import (
 )
 import logging
 
+from telegram_compat import patch_updater_slots
+
 # Setup logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+PTB_UPDATER_SLOTS_PATCHED = patch_updater_slots()
+
+if PTB_UPDATER_SLOTS_PATCHED:
+    logger.info("Applied python-telegram-bot Updater slot patch for Python 3.13 compatibility")
 
 # Configuration
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
