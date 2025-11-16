@@ -3,8 +3,10 @@ Code to Image Bot - macOS Window Style
 Creates beautiful code images with macOS window styling like Carbon/Ray.so
 """
 
-import os
+import importlib
 import io
+import os
+import sys
 from typing import Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from pygments import highlight
@@ -34,16 +36,37 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Work around python-telegram-bot bug where Updater.__slots__ misses
-# __polling_cleanup_cb (older patch levels on Python 3.13).
+# __polling_cleanup_cb (older patch levels on Python 3.13) by swapping in a
+# subclass that defines the missing slot and re-exporting it wherever PTB
+# expects the original Updater.
 if _PTBUpdater is not None:
     _UPDATER_SLOT = "_Updater__polling_cleanup_cb"
-    slots = getattr(_PTBUpdater, "__slots__", None)
-    if slots:
-        if isinstance(slots, str):
-            slots = (slots,)
-        if _UPDATER_SLOT not in slots:
-            _PTBUpdater.__slots__ = tuple(slots) + (_UPDATER_SLOT,)
-            setattr(_PTBUpdater, _UPDATER_SLOT, None)
+    slots = getattr(_PTBUpdater, "__slots__", ())
+    if isinstance(slots, str):
+        slots = (slots,)
+    elif slots is None:
+        slots = ()
+    else:
+        slots = tuple(slots)
+
+    if _UPDATER_SLOT not in slots:
+        class _PatchedUpdater(_PTBUpdater):  # type: ignore[misc]
+            __slots__ = slots + (_UPDATER_SLOT,)
+
+        for module_name in (
+            "telegram.ext",
+            "telegram.ext._updater",
+            "telegram.ext._applicationbuilder",
+        ):
+            module = sys.modules.get(module_name)
+            if module is None:
+                try:
+                    module = importlib.import_module(module_name)
+                except ModuleNotFoundError:
+                    continue
+            setattr(module, "Updater", _PatchedUpdater)
+
+        _PTBUpdater = _PatchedUpdater
 
 # Configuration
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
