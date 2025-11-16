@@ -2,7 +2,7 @@ services:
   - type: worker
     name: code-image-bot
     env: docker
-    plan: free
+    plan: starter
     dockerfilePath: ./Dockerfile
     autoDeploy: true
     envVars:

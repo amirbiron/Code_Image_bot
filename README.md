@@ -261,7 +261,7 @@ docker run -e TELEGRAM_BOT_TOKEN=your_token code-image-bot
 
 1. ודאו ש-`render.yaml` נמצא ב-root הרפו.
 2. ב-Render בחרו **New + → Blueprint** והצביעו לרפו.
-3. Render יקרא את `render.yaml` וייצור שירות Worker בשם `code-image-bot`.
+3. Render יקרא את `render.yaml` וייצור שירות Worker בשם `code-image-bot` עם תוכנית `starter` (7$ לחודש, ניתן לשנות בקובץ).
 4. בממשק Render הגדירו ערך ל-`TELEGRAM_BOT_TOKEN` (Env Vars → Add Environment Variable).
 5. לחצו Deploy – Render יריץ `docker build` ויתחיל את הבוט עם polling.
 
