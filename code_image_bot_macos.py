@@ -220,15 +220,69 @@ def create_gradient_background(width: int, height: int, color1: str, color2: str
     return base
 
 
+def create_gradient_border(width: int, height: int, border_width: int, color1: str, color2: str, radius: int) -> Image.Image:
+    """Create a gradient border image with 135deg diagonal gradient"""
+    # Convert hex colors to RGB
+    r1, g1, b1 = hex_to_rgb(color1)
+    r2, g2, b2 = hex_to_rgb(color2)
+    
+    # Create border image (slightly larger to accommodate border)
+    border_img = Image.new('RGBA', (width + border_width * 2, height + border_width * 2), (0, 0, 0, 0))
+    border_draw = ImageDraw.Draw(border_img)
+    
+    # Create outer and inner masks for rounded rectangle border
+    outer_mask = Image.new('L', (width + border_width * 2, height + border_width * 2), 0)
+    outer_draw = ImageDraw.Draw(outer_mask)
+    outer_draw.rounded_rectangle(
+        [(0, 0), (width + border_width * 2 - 1, height + border_width * 2 - 1)],
+        radius=radius + border_width,
+        fill=255
+    )
+    
+    inner_mask = Image.new('L', (width + border_width * 2, height + border_width * 2), 0)
+    inner_draw = ImageDraw.Draw(inner_mask)
+    inner_draw.rounded_rectangle(
+        [(border_width, border_width), 
+         (width + border_width - 1, height + border_width - 1)],
+        radius=radius,
+        fill=255
+    )
+    
+    # Draw gradient border
+    total_size = (width + border_width * 2) + (height + border_width * 2)
+    outer_data = outer_mask.load()
+    inner_data = inner_mask.load()
+    
+    for y in range(height + border_width * 2):
+        for x in range(width + border_width * 2):
+            # Check if pixel is in border area (in outer but not inner)
+            if outer_data[x, y] > 0 and inner_data[x, y] == 0:
+                # Calculate gradient position (135deg diagonal: top-left to bottom-right)
+                current_pos = x + y
+                ratio = current_pos / total_size if total_size > 0 else 0
+                ratio = max(0, min(1, ratio))
+                
+                # Interpolate colors
+                r = int(r1 + (r2 - r1) * ratio)
+                g = int(g1 + (g2 - g1) * ratio)
+                b = int(b1 + (b2 - b1) * ratio)
+                
+                border_draw.point((x, y), fill=(r, g, b, 255))
+    
+    return border_img
+
+
 def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str]) -> Image.Image:
     """
     Create macOS-style window with title bar and gradient background
     """
     # Window dimensions with dynamic padding based on code image size
     titlebar_height = 60
-    # Dynamic padding: minimum 30px, maximum 50px, scales with image size
-    padding = max(30, min(50, int(code_img.width * 0.05)))
+    # Dynamic padding: 1% of code image size
+    padding = max(1, int(code_img.width * 0.01))
     border_radius = 20
+    # Border width - thin border (50% thinner, making it 2px instead of 4px)
+    border_width = 2
     
     # Calculate final size
     window_width = code_img.width + (padding * 2)
@@ -306,23 +360,47 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     window.paste(shadow, (code_x - 10, code_y - 10), shadow)
     window.paste(code_img, (code_x, code_y))
     
+    # Create gradient border with pink/purple gradient (#d946ef to #8b5cf6)
+    gradient_border = create_gradient_border(
+        window_width, 
+        window_height, 
+        border_width, 
+        "#d946ef",  # Pink
+        "#8b5cf6",  # Purple
+        border_radius
+    )
+    
+    # Create window with border by pasting border first, then window on top
+    window_with_border = Image.new('RGBA', 
+                                   (window_width + border_width * 2, 
+                                    window_height + border_width * 2), 
+                                   (0, 0, 0, 0))
+    window_with_border.paste(gradient_border, (0, 0), gradient_border)
+    window_with_border.paste(window, (border_width, border_width), window)
+    
     # Add subtle shadow to entire window
     window_shadow = Image.new('RGBA', 
-                               (window_width + 60, window_height + 60),
+                               (window_width + border_width * 2 + 60, 
+                                window_height + border_width * 2 + 60),
                                (0, 0, 0, 0))
     window_shadow_draw = ImageDraw.Draw(window_shadow)
     window_shadow_draw.rounded_rectangle(
-        [(30, 30), (window_width + 30, window_height + 30)],
-        radius=border_radius,
+        [(30, 30), 
+         (window_width + border_width * 2 + 30, 
+          window_height + border_width * 2 + 30)],
+        radius=border_radius + border_width,
         fill=(0, 0, 0, 80)
     )
     window_shadow = window_shadow.filter(ImageFilter.GaussianBlur(20))
     
     # Composite everything
-    final_canvas = Image.new('RGBA', (window_width + 100, window_height + 100), (0, 0, 0, 0))
+    final_canvas = Image.new('RGBA', 
+                            (window_width + border_width * 2 + 100, 
+                             window_height + border_width * 2 + 100), 
+                            (0, 0, 0, 0))
     final_canvas.paste(final_img, (0, 0))
     final_canvas.paste(window_shadow, (20, 20), window_shadow)
-    final_canvas.paste(window, (50, 50), window)
+    final_canvas.paste(window_with_border, (50, 50), window_with_border)
     
     return final_canvas
 
