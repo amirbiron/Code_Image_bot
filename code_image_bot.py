@@ -19,10 +19,6 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-from telegram_compat import patch_updater_slots
-
-# Apply telegram compatibility patch for Python 3.13
-patch_updater_slots()
 
 # Configuration
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")

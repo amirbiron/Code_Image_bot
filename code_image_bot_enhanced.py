@@ -22,18 +22,12 @@ from telegram.ext import (
 )
 import logging
 
-from telegram_compat import patch_updater_slots
-
 # Setup logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
-PTB_UPDATER_SLOTS_PATCHED = patch_updater_slots()
-
-if PTB_UPDATER_SLOTS_PATCHED:
-    logger.info("Applied python-telegram-bot Updater slot patch for Python 3.13 compatibility")
 
 # Configuration
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
@@ -286,58 +280,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(welcome_text, parse_mode="Markdown")
 
 
-async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Theme selection command"""
-    keyboard = []
-    theme_items = list(THEMES.items())
-    
-    for i in range(0, len(theme_items), 2):
-        row = []
-        for j in range(2):
-            if i + j < len(theme_items):
-                theme_key, theme_info = theme_items[i + j]
-                row.append(
-                    InlineKeyboardButton(
-                        theme_info["name"],
-                        callback_data=f"theme_{theme_key}",
-                    )
-                )
-        keyboard.append(row)
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(
-        "🎨 *בחר ערכת נושא:*",
-        reply_markup=reply_markup,
-        parse_mode="Markdown",
-    )
-
-
-async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Language selection command"""
-    keyboard = []
-    lang_items = list(LANGUAGES.items())
-    
-    for i in range(0, len(lang_items), 2):
-        row = []
-        for j in range(2):
-            if i + j < len(lang_items):
-                lang_key, lang_name = lang_items[i + j]
-                row.append(
-                    InlineKeyboardButton(
-                        lang_name,
-                        callback_data=f"lang_{lang_key}",
-                    )
-                )
-        keyboard.append(row)
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(
-        "💻 *בחר שפת תכנות:*",
-        reply_markup=reply_markup,
-        parse_mode="Markdown",
-    )
-
-
 async def background_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Background style selection"""
     keyboard = [
@@ -460,8 +402,6 @@ def main():
     
     # Add handlers
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("theme", theme_command))
-    application.add_handler(CommandHandler("language", language_command))
     application.add_handler(CommandHandler("settings", settings_command))
     application.add_handler(CommandHandler("background", background_command))
     application.add_handler(CommandHandler("watermark", watermark_command))
