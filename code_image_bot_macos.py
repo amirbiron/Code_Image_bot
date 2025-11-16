@@ -20,6 +20,10 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
+try:  # python-telegram-bot < 21 (builder uses Updater internally)
+    from telegram.ext import Updater as _PTBUpdater  # type: ignore
+except ImportError:  # pragma: no cover
+    _PTBUpdater = None
 import logging
 
 # Setup logging
@@ -28,6 +32,18 @@ logging.basicConfig(
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+# Work around python-telegram-bot bug where Updater.__slots__ misses
+# __polling_cleanup_cb (older patch levels on Python 3.13).
+if _PTBUpdater is not None:
+    _UPDATER_SLOT = "_Updater__polling_cleanup_cb"
+    slots = getattr(_PTBUpdater, "__slots__", None)
+    if slots:
+        if isinstance(slots, str):
+            slots = (slots,)
+        if _UPDATER_SLOT not in slots:
+            _PTBUpdater.__slots__ = tuple(slots) + (_UPDATER_SLOT,)
+            setattr(_PTBUpdater, _UPDATER_SLOT, None)
 
 # Configuration
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
