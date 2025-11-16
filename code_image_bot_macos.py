@@ -227,7 +227,7 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     # Window dimensions with dynamic padding based on code image size
     titlebar_height = 60
     # Dynamic padding: minimum 8px, scales with image size (1% of width)
-    padding = max(8, int(code_img.width * 0.01))
+    padding = max(8, int(code_img.width * 0.02))
     border_radius = 20
     
     # Calculate final size
