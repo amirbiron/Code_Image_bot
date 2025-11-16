@@ -14,11 +14,7 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import ImageFormatter
 from pygments.styles import get_style_by_name
-from telegram import (
-    Update,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-)
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -230,8 +226,8 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     """
     # Window dimensions with dynamic padding based on code image size
     titlebar_height = 60
-    # Dynamic padding: minimum 30px, maximum 50px, scales with image size (1% of width)
-    padding = max(30, min(50, int(code_img.width * 0.01)))
+    # Dynamic padding: minimum 30px, maximum 50px, scales with image size (3% of width)
+    padding = max(30, min(50, int(code_img.width * 0.03)))
     border_radius = 20
     
     # Calculate final size
@@ -418,52 +414,50 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start command"""
     reporter.report_activity(update.effective_user.id)
     welcome_text = """
-🎨 <b>ברוכים הבאים לבוט המרת קוד לתמונה!</b>
+🎨 *ברוכים הבאים לבוט המרת קוד לתמונה!*
 
-✨ <b>עיצוב מסוג macOS Window עם רקעים צבעוניים!</b>
+✨ *עיצוב מסוג macOS Window עם רקעים צבעוניים!*
 
-<b>פקודות זמינות:</b>
-  /start - התחלה
-  /theme - בחר ערכת נושא
-  /language - בחר שפת תכנות
-  /font - בחר גופן (Fira Code, JetBrains Mono ועוד)
-  /toggle_numbers - הפעל/כבה מספור שורות
-  /settings - הגדרות נוכחיות
-  /help - עזרה
+*פקודות זמינות:*
+  `/start` - התחלה
+  `/theme` - בחר ערכת נושא
+  `/language` - בחר שפת תכנות
+  `/font` - בחר גופן (Fira Code, JetBrains Mono ועוד)
+  `/toggle_numbers` - הפעל/כבה מספור שורות
+  `/settings` - הגדרות נוכחיות
+  `/help` - עזרה
 
 פשוט שלח קוד ותקבל תמונה מעוצבת! 🚀
 """
-    await update.message.reply_text(
-        welcome_text,
-        parse_mode="HTML",
-    )
+    await update.message.reply_text(welcome_text, parse_mode="Markdown")
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Help command"""
     reporter.report_activity(update.effective_user.id)
     help_text = """
-📚 <b>מדריך שימוש</b>
+📚 *מדריך שימוש*
 
-<b>שליחת קוד:</b>
+*שליחת קוד:*
 שלח את קטע הקוד שלך כהודעה רגילה
 
-<b>דוגמה:</b>
-<pre><code>def hello():
+*דוגמה:*
+```python
+def hello():
     print("Hello World!")
-</code></pre>
+```
 
-<b>ערכות נושא:</b>
+*ערכות נושא:*
 🌙 Monokai (סגול), 🧛 Dracula (סגול-כחול)
 ❄️ Nord (כחול), 🌃 GitHub Dark (כחול)
 🎨 Material (ירוק-תכלת), 🟤 Gruvbox (כתום)
 
-<b>טיפים:</b>
+*טיפים:*
 • הבוט מזהה אוטומטית את שפת התכנות
 • כל תמונה נוצרת עם חלון macOS מעוצב
 • רקע צבעוני גרדיאנט ייחודי לכל נושא
 """
-    await update.message.reply_text(help_text, parse_mode="HTML")
+    await update.message.reply_text(help_text, parse_mode="Markdown")
 
 
 async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -487,9 +481,9 @@ async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "🎨 <b>בחר ערכת נושא:</b>",
+        "🎨 *בחר ערכת נושא:*",
         reply_markup=reply_markup,
-        parse_mode="HTML",
+        parse_mode="Markdown",
     )
 
 
@@ -514,9 +508,9 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "💻 <b>בחר שפת תכנות:</b>",
+        "💻 *בחר שפת תכנות:*",
         reply_markup=reply_markup,
-        parse_mode="HTML",
+        parse_mode="Markdown",
     )
 
 
@@ -541,9 +535,9 @@ async def font_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "🔤 <b>בחר גופן:</b>",
+        "🔤 *בחר גופן:*",
         reply_markup=reply_markup,
-        parse_mode="HTML",
+        parse_mode="Markdown",
     )
 
 
@@ -566,7 +560,7 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     settings = get_user_settings(user_id)
     
     settings_text = f"""
-⚙️ <b>ההגדרות שלך:</b>
+⚙️ *ההגדרות שלך:*
 
 🎨 ערכת נושא: {THEMES[settings['theme']]['name']}
 💻 שפת תכנות: {LANGUAGES[settings['language']]}
@@ -574,12 +568,12 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🔢 מספור שורות: {'✅' if settings['show_line_numbers'] else '❌'}
 
 שנה הגדרות עם:
-  /theme - שינוי ערכת נושא
-  /language - שינוי שפת תכנות
-  /font - שינוי גופן
-  /toggle_numbers - הפעל/כבה מספור שורות
+  `/theme` - שינוי ערכת נושא
+  `/language` - שינוי שפת תכנות
+  `/font` - שינוי גופן
+  `/toggle_numbers` - הפעל/כבה מספור שורות
 """
-    await update.message.reply_text(settings_text, parse_mode="HTML")
+    await update.message.reply_text(settings_text, parse_mode="Markdown")
 
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
