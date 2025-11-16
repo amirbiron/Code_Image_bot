@@ -242,25 +242,28 @@ sudo systemctl start code-image-bot
 
 ### Docker
 
-צור `Dockerfile`:
-
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-CMD ["python", "code_image_bot.py"]
-```
-
-הרץ:
+בקובץ `Dockerfile` שכבר נמצא בפרויקט מוגדרת סביבה מלאה עבור `code_image_bot_macos.py`, כולל התקנת כל הפונטים (Fira Code, JetBrains Mono, Cascadia Code ועוד).  
+כך תפעילו אותה:
 
 ```bash
+# בניית האימג'
 docker build -t code-image-bot .
+
+# הרצת הבוט עם הטוקן שלכם
 docker run -e TELEGRAM_BOT_TOKEN=your_token code-image-bot
 ```
+
+> אם אתם משתמשים ב-Render / Railway, העבירו את ה-build command ל-`docker build` (או השתמשו ב-Dockerfile buildpack) כדי להימנע משגיאת `apt-get` בסביבה עם read-only filesystem.
+
+### Render Deployment
+
+בקובץ `render.yaml` הוגדרת תצורה לשירות מסוג Worker שמבוסס על ה-Dockerfile:
+
+1. ודאו ש-`render.yaml` נמצא ב-root הרפו.
+2. ב-Render בחרו **New + → Blueprint** והצביעו לרפו.
+3. Render יקרא את `render.yaml` וייצור שירות Worker בשם `code-image-bot` עם תוכנית `starter` (7$ לחודש, ניתן לשנות בקובץ).
+4. בממשק Render הגדירו ערך ל-`TELEGRAM_BOT_TOKEN` (Env Vars → Add Environment Variable).
+5. לחצו Deploy – Render יריץ `docker build` ויתחיל את הבוט עם polling.
 
 ## 🤝 תרומה לפרויקט
 
