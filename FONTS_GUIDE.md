@@ -64,12 +64,18 @@ fc-cache -f -v
 # Hack
 sudo apt install fonts-hack
 
-# Ubuntu Mono (בדרך כלל מותקן כברירת מחדל)
-sudo apt install fonts-ubuntu
+# Ubuntu Mono (בגרסאות חדשות של Debian/Ubuntu ייתכן שהחבילה חסרה)
+wget -O ubuntu-fonts.zip https://assets.ubuntu.com/v1/fad7939b-ubuntu-font-family-0.83.zip
+unzip ubuntu-fonts.zip -d ubuntu-fonts
+mkdir -p ~/.local/share/fonts/ubuntu
+find ubuntu-fonts -name "*.ttf" -exec cp {} ~/.local/share/fonts/ubuntu/ \;
+rm -rf ubuntu-fonts ubuntu-fonts.zip
+fc-cache -f -v
 
 # DejaVu (בדרך כלל מותקן כברירת מחדל)
 sudo apt install fonts-dejavu
 ```
+> אם הפקודה `sudo apt install fonts-ubuntu` עדיין זמינה אצלך (לדוגמה ב-Ubuntu 22.04), אפשר להשתמש בה במקום ההתקנה הידנית.
 
 ## התקנה בשרת (Render/Heroku/VPS)
 
@@ -85,26 +91,29 @@ RUN apt-get update && apt-get install -y \
     fonts-firacode \
     fonts-hack \
     fonts-dejavu \
-    fonts-ubuntu \
+    fontconfig \
     wget \
     unzip \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install JetBrains Mono manually
-RUN mkdir -p /usr/share/fonts/truetype/jetbrains && \
-    cd /tmp && \
-    wget https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip && \
-    unzip JetBrainsMono-2.304.zip -d /usr/share/fonts/truetype/jetbrains/ && \
-    fc-cache -f -v && \
-    rm JetBrainsMono-2.304.zip
-
-# Install Cascadia Code
-RUN mkdir -p /usr/share/fonts/truetype/cascadia && \
-    cd /tmp && \
-    wget https://github.com/microsoft/cascadia-code/releases/download/v2111.01/CascadiaCode-2111.01.zip && \
-    unzip CascadiaCode-2111.01.zip -d /usr/share/fonts/truetype/cascadia/ && \
-    fc-cache -f -v && \
-    rm CascadiaCode-2111.01.zip
+# Install JetBrains Mono, Cascadia Code, and Ubuntu fonts manually
+RUN set -eux; \
+    mkdir -p /usr/share/fonts/truetype/jetbrains /usr/share/fonts/truetype/cascadia /usr/share/fonts/truetype/ubuntu; \
+    cd /tmp; \
+    wget -O JetBrainsMono.zip https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip; \
+    unzip JetBrainsMono.zip -d JetBrainsMono; \
+    find JetBrainsMono -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/jetbrains/ \;; \
+    rm -rf JetBrainsMono JetBrainsMono.zip; \
+    wget -O CascadiaCode.zip https://github.com/microsoft/cascadia-code/releases/download/v2111.01/CascadiaCode-2111.01.zip; \
+    unzip CascadiaCode.zip -d CascadiaCode; \
+    find CascadiaCode -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/cascadia/ \;; \
+    rm -rf CascadiaCode CascadiaCode.zip; \
+    wget -O UbuntuFonts.zip https://assets.ubuntu.com/v1/fad7939b-ubuntu-font-family-0.83.zip; \
+    unzip UbuntuFonts.zip -d UbuntuFonts; \
+    find UbuntuFonts -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/ubuntu/ \;; \
+    rm -rf UbuntuFonts UbuntuFonts.zip; \
+    fc-cache -f -v
 
 WORKDIR /app
 COPY requirements.txt .
@@ -123,7 +132,7 @@ CMD ["python", "code_image_bot_macos.py"]
 
 # Install basic fonts
 apt-get update
-apt-get install -y fonts-firacode fonts-hack fonts-dejavu fonts-ubuntu wget unzip
+apt-get install -y fonts-firacode fonts-hack fonts-dejavu fontconfig wget unzip ca-certificates
 
 # Install JetBrains Mono
 mkdir -p /usr/share/fonts/truetype/jetbrains
@@ -139,6 +148,14 @@ wget https://github.com/microsoft/cascadia-code/releases/download/v2111.01/Casca
 unzip CascadiaCode-2111.01.zip -d /usr/share/fonts/truetype/cascadia/
 fc-cache -f -v
 rm CascadiaCode-2111.01.zip
+
+# Install Ubuntu fonts manually (fonts-ubuntu no longer in Debian testing)
+mkdir -p /usr/share/fonts/truetype/ubuntu
+wget -O UbuntuFonts.zip https://assets.ubuntu.com/v1/fad7939b-ubuntu-font-family-0.83.zip
+unzip UbuntuFonts.zip -d UbuntuFonts
+find UbuntuFonts -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/ubuntu/ \;
+rm -rf UbuntuFonts UbuntuFonts.zip
+fc-cache -f -v
 
 echo "✅ All fonts installed successfully!"
 ```
