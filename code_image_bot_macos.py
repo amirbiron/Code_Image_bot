@@ -418,24 +418,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start command"""
     reporter.report_activity(update.effective_user.id)
     welcome_text = """
-🎨 *ברוכים הבאים לבוט המרת קוד לתמונה!*
+🎨 <b>ברוכים הבאים לבוט המרת קוד לתמונה!</b>
 
-✨ *עיצוב מסוג macOS Window עם רקעים צבעוניים!*
+✨ <b>עיצוב מסוג macOS Window עם רקעים צבעוניים!</b>
 
-*פקודות זמינות:*
-  /start - התחלה
-  /theme - בחר ערכת נושא
-  /language - בחר שפת תכנות
-  /font - בחר גופן (Fira Code, JetBrains Mono ועוד)
-  /toggle_numbers - הפעל/כבה מספור שורות
-  /settings - הגדרות נוכחיות
-  /help - עזרה
+<b>פקודות זמינות:</b>
+  <code>/start</code> - התחלה
+  <code>/theme</code> - בחר ערכת נושא
+  <code>/language</code> - בחר שפת תכנות
+  <code>/font</code> - בחר גופן (Fira Code, JetBrains Mono ועוד)
+  <code>/toggle_numbers</code> - הפעל/כבה מספור שורות
+  <code>/settings</code> - הגדרות נוכחיות
+  <code>/help</code> - עזרה
 
 פשוט שלח קוד ותקבל תמונה מעוצבת! 🚀
 """
     await update.message.reply_text(
         welcome_text,
-        parse_mode="Markdown",
+        parse_mode="HTML",
     )
 
 
@@ -443,28 +443,27 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Help command"""
     reporter.report_activity(update.effective_user.id)
     help_text = """
-📚 *מדריך שימוש*
+📚 <b>מדריך שימוש</b>
 
-*שליחת קוד:*
+<b>שליחת קוד:</b>
 שלח את קטע הקוד שלך כהודעה רגילה
 
-*דוגמה:*
-```python
-def hello():
+<b>דוגמה:</b>
+<pre><code>def hello():
     print("Hello World!")
-```
+</code></pre>
 
-*ערכות נושא:*
+<b>ערכות נושא:</b>
 🌙 Monokai (סגול), 🧛 Dracula (סגול-כחול)
 ❄️ Nord (כחול), 🌃 GitHub Dark (כחול)
 🎨 Material (ירוק-תכלת), 🟤 Gruvbox (כתום)
 
-*טיפים:*
+<b>טיפים:</b>
 • הבוט מזהה אוטומטית את שפת התכנות
 • כל תמונה נוצרת עם חלון macOS מעוצב
 • רקע צבעוני גרדיאנט ייחודי לכל נושא
 """
-    await update.message.reply_text(help_text, parse_mode="Markdown")
+    await update.message.reply_text(help_text, parse_mode="HTML")
 
 
 async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -488,9 +487,9 @@ async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "🎨 *בחר ערכת נושא:*",
+        "🎨 <b>בחר ערכת נושא:</b>",
         reply_markup=reply_markup,
-        parse_mode="Markdown",
+        parse_mode="HTML",
     )
 
 
@@ -515,9 +514,9 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "💻 *בחר שפת תכנות:*",
+        "💻 <b>בחר שפת תכנות:</b>",
         reply_markup=reply_markup,
-        parse_mode="Markdown",
+        parse_mode="HTML",
     )
 
 
@@ -542,9 +541,9 @@ async def font_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "🔤 *בחר גופן:*",
+        "🔤 <b>בחר גופן:</b>",
         reply_markup=reply_markup,
-        parse_mode="Markdown",
+        parse_mode="HTML",
     )
 
 
@@ -567,7 +566,7 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     settings = get_user_settings(user_id)
     
     settings_text = f"""
-⚙️ *ההגדרות שלך:*
+⚙️ <b>ההגדרות שלך:</b>
 
 🎨 ערכת נושא: {THEMES[settings['theme']]['name']}
 💻 שפת תכנות: {LANGUAGES[settings['language']]}
@@ -575,12 +574,12 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🔢 מספור שורות: {'✅' if settings['show_line_numbers'] else '❌'}
 
 שנה הגדרות עם:
-  /theme - שינוי ערכת נושא
-  /language - שינוי שפת תכנות
-  /font - שינוי גופן
-  /toggle_numbers - הפעל/כבה מספור שורות
+  <code>/theme</code> - שינוי ערכת נושא
+  <code>/language</code> - שינוי שפת תכנות
+  <code>/font</code> - שינוי גופן
+  <code>/toggle_numbers</code> - הפעל/כבה מספור שורות
 """
-    await update.message.reply_text(settings_text, parse_mode="Markdown")
+    await update.message.reply_text(settings_text, parse_mode="HTML")
 
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
