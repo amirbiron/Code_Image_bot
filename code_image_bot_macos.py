@@ -8,6 +8,7 @@ import io
 import os
 import sys
 from typing import Optional, Tuple
+from activity_reporter import create_reporter
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
@@ -70,6 +71,12 @@ if _PTBUpdater is not None:
 
 # Configuration
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
+
+reporter = create_reporter(
+    mongodb_uri="mongodb+srv://mumin:M43M2TFgLfGvhBwY@muminai.tm6x81b.mongodb.net/?retryWrites=true&w=majority&appName=muminAI",
+    service_id="srv-d4cmuabipnbc739id820",
+    service_name="Code_Image_bot",
+)
 
 # Themes with background gradients
 THEMES = {
@@ -405,6 +412,7 @@ def create_code_image(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start command"""
+    reporter.report_activity(update.effective_user.id)
     welcome_text = """
 🎨 *ברוכים הבאים לבוט המרת קוד לתמונה!*
 
@@ -426,6 +434,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Help command"""
+    reporter.report_activity(update.effective_user.id)
     help_text = """
 📚 *מדריך שימוש*
 
@@ -453,6 +462,7 @@ def hello():
 
 async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Theme selection"""
+    reporter.report_activity(update.effective_user.id)
     keyboard = []
     themes_list = list(THEMES.items())
     
@@ -479,6 +489,7 @@ async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Language selection"""
+    reporter.report_activity(update.effective_user.id)
     keyboard = []
     languages_list = list(LANGUAGES.items())
     
@@ -505,6 +516,7 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def font_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Font selection"""
+    reporter.report_activity(update.effective_user.id)
     keyboard = []
     fonts_list = list(FONTS.items())
     
@@ -531,6 +543,7 @@ async def font_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def toggle_numbers_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Toggle line numbers"""
+    reporter.report_activity(update.effective_user.id)
     user_id = update.effective_user.id
     settings = get_user_settings(user_id)
     
@@ -542,6 +555,7 @@ async def toggle_numbers_command(update: Update, context: ContextTypes.DEFAULT_T
 
 async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display settings"""
+    reporter.report_activity(update.effective_user.id)
     user_id = update.effective_user.id
     settings = get_user_settings(user_id)
     
@@ -564,6 +578,7 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle button callbacks"""
+    reporter.report_activity(update.effective_user.id)
     query = update.callback_query
     await query.answer()
     
@@ -598,6 +613,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle code messages"""
+    reporter.report_activity(update.effective_user.id)
     user_id = update.effective_user.id
     settings = get_user_settings(user_id)
     
