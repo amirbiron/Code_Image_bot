@@ -255,6 +255,16 @@ docker run -e TELEGRAM_BOT_TOKEN=your_token code-image-bot
 
 > אם אתם משתמשים ב-Render / Railway, העבירו את ה-build command ל-`docker build` (או השתמשו ב-Dockerfile buildpack) כדי להימנע משגיאת `apt-get` בסביבה עם read-only filesystem.
 
+### Render Deployment
+
+בקובץ `render.yaml` הוגדרת תצורה לשירות מסוג Worker שמבוסס על ה-Dockerfile:
+
+1. ודאו ש-`render.yaml` נמצא ב-root הרפו.
+2. ב-Render בחרו **New + → Blueprint** והצביעו לרפו.
+3. Render יקרא את `render.yaml` וייצור שירות Worker בשם `code-image-bot`.
+4. בממשק Render הגדירו ערך ל-`TELEGRAM_BOT_TOKEN` (Env Vars → Add Environment Variable).
+5. לחצו Deploy – Render יריץ `docker build` ויתחיל את הבוט עם polling.
+
 ## 🤝 תרומה לפרויקט
 
 נשמח לתרומות! אפשר:
