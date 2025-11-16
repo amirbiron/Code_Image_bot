@@ -24,7 +24,7 @@ RUN set -eux; \
     unzip JetBrainsMono.zip -d JetBrainsMono; \
     find JetBrainsMono -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/jetbrains/ \;; \
     rm -rf JetBrainsMono JetBrainsMono.zip; \
-    wget -O VictorMono.zip https://github.com/rubjo/victor-mono/releases/download/v1.5.6/VictorMono.zip; \
+    wget -O VictorMono.zip https://rubjo.github.io/victor-mono/VictorMonoAll.zip; \
     unzip VictorMono.zip -d VictorMono; \
     find VictorMono -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/victor-mono/ \;; \
     rm -rf VictorMono VictorMono.zip; \
