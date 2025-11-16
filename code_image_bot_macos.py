@@ -423,13 +423,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 ✨ <b>עיצוב מסוג macOS Window עם רקעים צבעוניים!</b>
 
 <b>פקודות זמינות:</b>
-  <code>/start</code> - התחלה
-  <code>/theme</code> - בחר ערכת נושא
-  <code>/language</code> - בחר שפת תכנות
-  <code>/font</code> - בחר גופן (Fira Code, JetBrains Mono ועוד)
-  <code>/toggle_numbers</code> - הפעל/כבה מספור שורות
-  <code>/settings</code> - הגדרות נוכחיות
-  <code>/help</code> - עזרה
+  /start - התחלה
+  /theme - בחר ערכת נושא
+  /language - בחר שפת תכנות
+  /font - בחר גופן (Fira Code, JetBrains Mono ועוד)
+  /toggle_numbers - הפעל/כבה מספור שורות
+  /settings - הגדרות נוכחיות
+  /help - עזרה
 
 פשוט שלח קוד ותקבל תמונה מעוצבת! 🚀
 """
@@ -574,10 +574,10 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🔢 מספור שורות: {'✅' if settings['show_line_numbers'] else '❌'}
 
 שנה הגדרות עם:
-  <code>/theme</code> - שינוי ערכת נושא
-  <code>/language</code> - שינוי שפת תכנות
-  <code>/font</code> - שינוי גופן
-  <code>/toggle_numbers</code> - הפעל/כבה מספור שורות
+  /theme - שינוי ערכת נושא
+  /language - שינוי שפת תכנות
+  /font - שינוי גופן
+  /toggle_numbers - הפעל/כבה מספור שורות
 """
     await update.message.reply_text(settings_text, parse_mode="HTML")
 
