@@ -2,10 +2,11 @@
 
 ## פונטים זמינים בבוט
 
-הבוט תומך ב-6 פונטים מקצועיים:
+הבוט תומך ב-7 פונטים מקצועיים:
 
 - ✨ **Fira Code** - פופולרי במיוחד, עם ligatures (ברירת מחדל)
 - 🚀 **JetBrains Mono** - נוצר על ידי JetBrains, אידיאלי לקוד
+- ⚡ **Victor Mono** - פונט אלגנטי עם ligatures cursive
 - 💻 **Cascadia Code** - מבית Microsoft
 - 📝 **DejaVu Sans Mono** - מובנה ברוב המערכות
 - 🟠 **Ubuntu Mono** - נקי ופשוט
@@ -18,6 +19,7 @@
 1. הורד את הפונטים:
    - [Fira Code](https://github.com/tonsky/FiraCode/releases)
    - [JetBrains Mono](https://www.jetbrains.com/lp/mono/)
+   - [Victor Mono](https://github.com/rubjo/victor-mono/releases)
    - [Cascadia Code](https://github.com/microsoft/cascadia-code/releases)
    - [Hack](https://sourcefoundry.org/hack/)
 
@@ -34,6 +36,9 @@ brew install --cask font-fira-code
 
 # JetBrains Mono
 brew install --cask font-jetbrains-mono
+
+# Victor Mono
+brew install --cask font-victor-mono
 
 # Cascadia Code
 brew install --cask font-cascadia-code
@@ -54,6 +59,11 @@ sudo apt install fonts-firacode
 # JetBrains Mono (דורש הורדה ידנית או)
 wget https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip
 unzip JetBrainsMono-2.304.zip -d ~/.fonts/
+fc-cache -f -v
+
+# Victor Mono
+wget https://github.com/rubjo/victor-mono/releases/download/v1.5.6/VictorMono.zip
+unzip VictorMono.zip -d ~/.fonts/
 fc-cache -f -v
 
 # Cascadia Code
@@ -97,14 +107,18 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install JetBrains Mono, Cascadia Code, and Ubuntu fonts manually
+# Install JetBrains Mono, Victor Mono, Cascadia Code, and Ubuntu fonts manually
 RUN set -eux; \
-    mkdir -p /usr/share/fonts/truetype/jetbrains /usr/share/fonts/truetype/cascadia /usr/share/fonts/truetype/ubuntu; \
+    mkdir -p /usr/share/fonts/truetype/jetbrains /usr/share/fonts/truetype/victor-mono /usr/share/fonts/truetype/cascadia /usr/share/fonts/truetype/ubuntu; \
     cd /tmp; \
     wget -O JetBrainsMono.zip https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip; \
     unzip JetBrainsMono.zip -d JetBrainsMono; \
     find JetBrainsMono -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/jetbrains/ \;; \
     rm -rf JetBrainsMono JetBrainsMono.zip; \
+    wget -O VictorMono.zip https://github.com/rubjo/victor-mono/releases/download/v1.5.6/VictorMono.zip; \
+    unzip VictorMono.zip -d VictorMono; \
+    find VictorMono -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/victor-mono/ \;; \
+    rm -rf VictorMono VictorMono.zip; \
     wget -O CascadiaCode.zip https://github.com/microsoft/cascadia-code/releases/download/v2111.01/CascadiaCode-2111.01.zip; \
     unzip CascadiaCode.zip -d CascadiaCode; \
     find CascadiaCode -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/cascadia/ \;; \
@@ -141,6 +155,13 @@ wget https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrai
 unzip JetBrainsMono-2.304.zip -d /usr/share/fonts/truetype/jetbrains/
 fc-cache -f -v
 rm JetBrainsMono-2.304.zip
+
+# Install Victor Mono
+mkdir -p /usr/share/fonts/truetype/victor-mono
+wget https://github.com/rubjo/victor-mono/releases/download/v1.5.6/VictorMono.zip
+unzip VictorMono.zip -d /usr/share/fonts/truetype/victor-mono/
+fc-cache -f -v
+rm VictorMono.zip
 
 # Install Cascadia Code
 mkdir -p /usr/share/fonts/truetype/cascadia
@@ -227,10 +248,12 @@ fc-list | grep -i "jetbrains"
 ### לפיתוח מקומי
 - **Fira Code** - הכי פופולרי, עם ligatures יפים
 - **JetBrains Mono** - קל לקריאה, מעוצב מצוין
+- **Victor Mono** - מעולה ל-cursive ligatures ועיצוב אלגנטי
 
 ### לפרודקשן (שרת)
 - **DejaVu Sans Mono** - תמיד זמין, לא דורש התקנה
 - **Hack** - קל להתקנה, איכות טובה
+- **Victor Mono** - אלגנטי, אם יש זמן להתקנה ידנית
 
 ### לעברית
 כל הפונטים תומכים בעברית מצוין, אבל:
@@ -255,9 +278,9 @@ def get_user_settings(user_id: int) -> dict:
 
 ## טיפים
 
-1. **Ligatures** - רק Fira Code ו-JetBrains Mono תומכים ב-ligatures (== -> ≡, >= -> ≥)
+1. **Ligatures** - Fira Code, JetBrains Mono, ו-Victor Mono תומכים ב-ligatures (== -> ≡, >= -> ≥)
 2. **גודל** - כל הפונטים מוצגים בגודל 16, אפשר לשנות ב-`create_code_image`
-3. **ביצועים** - DejaVu הכי מהיר, JetBrains הכי יפה
+3. **ביצועים** - DejaVu הכי מהיר, Victor Mono הכי ייחודי
 4. **תאימות** - DejaVu תמיד עובד, אפילו בלי התקנה
 
 ---
