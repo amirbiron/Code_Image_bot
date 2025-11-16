@@ -217,9 +217,10 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     """
     Create macOS-style window with title bar and gradient background
     """
-    # Window dimensions
+    # Window dimensions with dynamic padding based on code image size
     titlebar_height = 60
-    padding = 40  # Reduced from 80 to 40 to fix spacing issue
+    # Dynamic padding: minimum 30px, maximum 50px, scales with image size
+    padding = max(30, min(50, int(code_img.width * 0.05)))
     border_radius = 20
     
     # Calculate final size
