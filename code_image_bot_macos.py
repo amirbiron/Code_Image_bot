@@ -14,7 +14,13 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import ImageFormatter
 from pygments.styles import get_style_by_name
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+)
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -429,7 +435,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 פשוט שלח קוד ותקבל תמונה מעוצבת! 🚀
 """
-    await update.message.reply_text(welcome_text, parse_mode="Markdown")
+    commands_keyboard = [
+        [KeyboardButton("/theme"), KeyboardButton("/language")],
+        [KeyboardButton("/font"), KeyboardButton("/toggle_numbers")],
+        [KeyboardButton("/settings"), KeyboardButton("/help")],
+    ]
+    reply_markup = ReplyKeyboardMarkup(commands_keyboard, resize_keyboard=True)
+    await update.message.reply_text(
+        welcome_text,
+        parse_mode="Markdown",
+        reply_markup=reply_markup,
+    )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
