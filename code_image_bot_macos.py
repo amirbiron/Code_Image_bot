@@ -226,9 +226,10 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     """
     # Window dimensions with dynamic padding based on code image size
     titlebar_height = 60
-    # Dynamic padding: minimum 30px, maximum 50px, scales with image size
-    padding = max(30, min(50, int(code_img.width * 0.05)))
+    # Dynamic padding: 1% of code image size for tight fit
+    padding = max(int(code_img.width * 0.01), 10)  # minimum 10px
     border_radius = 20
+    border_thickness = 3  # Thin border instead of thick shadow
     
     # Calculate final size
     window_width = code_img.width + (padding * 2)
@@ -306,14 +307,34 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     window.paste(shadow, (code_x - 10, code_y - 10), shadow)
     window.paste(code_img, (code_x, code_y))
     
-    # Add subtle shadow to entire window
+    # Add thin pink border to entire window
+    border_color = '#FF10F0'  # Bright pink/magenta border - TODO: update color from user's image
+    window_with_border = Image.new('RGBA', 
+                                   (window_width + border_thickness * 2, 
+                                    window_height + border_thickness * 2),
+                                   (0, 0, 0, 0))
+    border_draw = ImageDraw.Draw(window_with_border)
+    # Draw the thin border
+    border_draw.rounded_rectangle(
+        [(0, 0), (window_width + border_thickness * 2, window_height + border_thickness * 2)],
+        radius=border_radius + border_thickness,
+        fill=border_color
+    )
+    # Paste the window on top of the border
+    window_with_border.paste(window, (border_thickness, border_thickness), window)
+    
+    # Add subtle shadow to entire window (keeping the original shadow effect)
+    shadow_offset = 20
     window_shadow = Image.new('RGBA', 
-                               (window_width + 60, window_height + 60),
+                               (window_width + border_thickness * 2 + 40, 
+                                window_height + border_thickness * 2 + 40),
                                (0, 0, 0, 0))
     window_shadow_draw = ImageDraw.Draw(window_shadow)
     window_shadow_draw.rounded_rectangle(
-        [(30, 30), (window_width + 30, window_height + 30)],
-        radius=border_radius,
+        [(shadow_offset, shadow_offset), 
+         (window_width + border_thickness * 2 + shadow_offset, 
+          window_height + border_thickness * 2 + shadow_offset)],
+        radius=border_radius + border_thickness,
         fill=(0, 0, 0, 80)
     )
     window_shadow = window_shadow.filter(ImageFilter.GaussianBlur(20))
@@ -321,8 +342,14 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     # Composite everything
     final_canvas = Image.new('RGBA', (window_width + 100, window_height + 100), (0, 0, 0, 0))
     final_canvas.paste(final_img, (0, 0))
-    final_canvas.paste(window_shadow, (20, 20), window_shadow)
-    final_canvas.paste(window, (50, 50), window)
+    # Paste shadow first, then window with border on top
+    canvas_offset = 50
+    final_canvas.paste(window_shadow, (canvas_offset - shadow_offset - border_thickness, 
+                                       canvas_offset - shadow_offset - border_thickness), 
+                      window_shadow)
+    final_canvas.paste(window_with_border, (canvas_offset - border_thickness, 
+                                            canvas_offset - border_thickness), 
+                      window_with_border)
     
     return final_canvas
 
