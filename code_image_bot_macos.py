@@ -18,8 +18,6 @@ from telegram import (
     Update,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    ReplyKeyboardMarkup,
-    KeyboardButton,
 )
 from telegram.ext import (
     Application,
@@ -232,8 +230,8 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     """
     # Window dimensions with dynamic padding based on code image size
     titlebar_height = 60
-    # Dynamic padding: minimum 30px, maximum 50px, scales with image size (3% of width)
-    padding = max(30, min(50, int(code_img.width * 0.03)))
+    # Dynamic padding: minimum 30px, maximum 50px, scales with image size (1% of width)
+    padding = max(30, min(50, int(code_img.width * 0.01)))
     border_radius = 20
     
     # Calculate final size
@@ -435,16 +433,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 פשוט שלח קוד ותקבל תמונה מעוצבת! 🚀
 """
-    commands_keyboard = [
-        [KeyboardButton("/theme"), KeyboardButton("/language")],
-        [KeyboardButton("/font"), KeyboardButton("/toggle_numbers")],
-        [KeyboardButton("/settings"), KeyboardButton("/help")],
-    ]
-    reply_markup = ReplyKeyboardMarkup(commands_keyboard, resize_keyboard=True)
     await update.message.reply_text(
         welcome_text,
         parse_mode="Markdown",
-        reply_markup=reply_markup,
     )
 
 
