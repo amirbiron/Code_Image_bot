@@ -147,6 +147,11 @@ FONTS = {
         "path": "/usr/share/fonts/truetype/jetbrains/JetBrainsMono-Regular.ttf",
         "fallback": "DejaVu Sans Mono",
     },
+    "victor": {
+        "name": "⚡ Victor Mono",
+        "path": "/usr/share/fonts/truetype/victor-mono/VictorMono-Regular.ttf",
+        "fallback": "DejaVu Sans Mono",
+    },
     "cascadia": {
         "name": "💻 Cascadia Code",
         "path": "/usr/share/fonts/truetype/cascadia/CascadiaCode.ttf",
@@ -214,7 +219,7 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     """
     # Window dimensions
     titlebar_height = 60
-    padding = 80
+    padding = 40  # Reduced from 80 to 40 to fix spacing issue
     border_radius = 20
     
     # Calculate final size
