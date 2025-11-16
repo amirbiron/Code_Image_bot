@@ -14,7 +14,7 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import ImageFormatter
 from pygments.styles import get_style_by_name
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -226,8 +226,8 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     """
     # Window dimensions with dynamic padding based on code image size
     titlebar_height = 60
-    # Dynamic padding: minimum 30px, maximum 50px, scales with image size (3% of width)
-    padding = max(30, min(50, int(code_img.width * 0.03)))
+    # Dynamic padding: minimum 8px, scales with image size (1% of width)
+    padding = max(8, int(code_img.width * 0.01))
     border_radius = 20
     
     # Calculate final size
@@ -429,7 +429,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 פשוט שלח קוד ותקבל תמונה מעוצבת! 🚀
 """
-    await update.message.reply_text(welcome_text, parse_mode="Markdown")
+    await update.message.reply_text(
+        welcome_text,
+        parse_mode="Markdown",
+        reply_markup=ReplyKeyboardRemove(),
+    )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -629,7 +633,10 @@ async def handle_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if lang_hint in LANGUAGES:
                 settings["language"] = lang_hint
     
-    status_msg = await update.message.reply_text("⏳ יוצר תמונה מעוצבת...")
+    status_msg = await update.message.reply_text(
+        "⏳ יוצר תמונה מעוצבת...",
+        reply_markup=ReplyKeyboardRemove(),
+    )
     
     try:
         image_bytes = create_code_image(
