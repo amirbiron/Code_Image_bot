@@ -10,16 +10,15 @@ RUN apt-get update \
         fonts-firacode \
         fonts-hack \
         fonts-dejavu \
-        fonts-ubuntu \
         fontconfig \
         wget \
         unzip \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install JetBrains Mono and Cascadia Code manually (not in apt repos)
+# Install JetBrains Mono, Cascadia Code, and Ubuntu fonts manually (not in apt repos)
 RUN set -eux; \
-    mkdir -p /usr/share/fonts/truetype/jetbrains /usr/share/fonts/truetype/cascadia; \
+    mkdir -p /usr/share/fonts/truetype/jetbrains /usr/share/fonts/truetype/cascadia /usr/share/fonts/truetype/ubuntu; \
     cd /tmp; \
     wget -O JetBrainsMono.zip https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip; \
     unzip JetBrainsMono.zip -d JetBrainsMono; \
@@ -29,6 +28,10 @@ RUN set -eux; \
     unzip CascadiaCode.zip -d CascadiaCode; \
     find CascadiaCode -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/cascadia/ \;; \
     rm -rf CascadiaCode CascadiaCode.zip; \
+    wget -O UbuntuFonts.zip https://assets.ubuntu.com/v1/fad7939b-ubuntu-font-family-0.83.zip; \
+    unzip UbuntuFonts.zip -d UbuntuFonts; \
+    find UbuntuFonts -name "*.ttf" -exec install -m 644 {} /usr/share/fonts/truetype/ubuntu/ \;; \
+    rm -rf UbuntuFonts UbuntuFonts.zip; \
     fc-cache -f -v
 
 WORKDIR /app
