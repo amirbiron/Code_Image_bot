@@ -7,6 +7,7 @@ import os
 import io
 from typing import Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import pillow_compat  # noqa: F401  # Ensure Pillow textsize compatibility
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import ImageFormatter
