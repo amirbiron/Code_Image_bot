@@ -8,7 +8,6 @@ import io
 import os
 import sys
 from typing import Optional, Tuple
-import urllib.request
 from activity_reporter import create_reporter
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import pillow_compat  # noqa: F401  # Ensure Pillow textsize compatibility
@@ -150,53 +149,36 @@ FONTS = {
         "name": "✨ Fira Code",
         "path": "/usr/share/fonts/truetype/firacode/FiraCode-Regular.ttf",
         "fallback": "DejaVu Sans Mono",
-        "supports_hebrew": True,
     },
     "jetbrains": {
         "name": "🚀 JetBrains Mono",
         "path": "/usr/share/fonts/truetype/jetbrains/JetBrainsMono-Regular.ttf",
         "fallback": "DejaVu Sans Mono",
-        "supports_hebrew": True,
     },
     "victor": {
         "name": "⚡ Victor Mono",
         "path": "/usr/share/fonts/truetype/victor-mono/VictorMono-Regular.ttf",
         "fallback": "DejaVu Sans Mono",
-        "supports_hebrew": True,
     },
     "cascadia": {
         "name": "💻 Cascadia Code",
         "path": "/usr/share/fonts/truetype/cascadia/CascadiaCode.ttf",
         "fallback": "DejaVu Sans Mono",
-        "supports_hebrew": True,
     },
     "dejavu": {
         "name": "📝 DejaVu Sans Mono",
         "path": "DejaVu Sans Mono",
         "fallback": "DejaVu Sans Mono",
-        "supports_hebrew": True,
     },
     "ubuntu": {
         "name": "🟠 Ubuntu Mono",
         "path": "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf",
         "fallback": "DejaVu Sans Mono",
-        "supports_hebrew": True,
     },
     "hack": {
         "name": "🔧 Hack",
         "path": "/usr/share/fonts/truetype/hack/Hack-Regular.ttf",
         "fallback": "DejaVu Sans Mono",
-        "supports_hebrew": True,
-    },
-    "ebgaramond": {
-        "name": "📖 EB Garamond",
-        # Downloaded on-demand (to avoid committing binary font files).
-        "path": "EB Garamond",
-        "download_url": "https://github.com/google/fonts/raw/main/ofl/ebgaramond/EBGaramond-Regular.ttf",
-        "download_filename": "EBGaramond-Regular.ttf",
-        "fallback": "DejaVu Sans Mono",
-        # EB Garamond (Google Fonts) does not include Hebrew glyphs.
-        "supports_hebrew": False,
     },
 }
 
@@ -346,54 +328,6 @@ def create_macos_window(code_img: Image.Image, gradient_colors: Tuple[str, str])
     return final_canvas
 
 
-def _contains_hebrew(text: str) -> bool:
-    # Hebrew block: U+0590..U+05FF
-    return any("\u0590" <= ch <= "\u05FF" for ch in text)
-
-
-def _get_font_cache_dir() -> str:
-    return os.getenv(
-        "CODE_IMAGE_BOT_FONT_CACHE_DIR",
-        os.path.join(os.path.expanduser("~"), ".cache", "code_image_bot", "fonts"),
-    )
-
-
-def _ensure_downloaded_font_file(font_key: str) -> Optional[str]:
-    """
-    Ensure the font file exists locally and return its path.
-    Returns None if the font cannot be fetched.
-    """
-    font_details = FONTS.get(font_key)
-    if not font_details:
-        return None
-
-    download_url = font_details.get("download_url")
-    download_filename = font_details.get("download_filename")
-    if not download_url or not download_filename:
-        return None
-
-    cache_dir = _get_font_cache_dir()
-    try:
-        os.makedirs(cache_dir, exist_ok=True)
-    except Exception:
-        return None
-
-    target_path = os.path.join(cache_dir, download_filename)
-    if os.path.exists(target_path):
-        return target_path
-
-    try:
-        urllib.request.urlretrieve(download_url, target_path)  # noqa: S310
-        return target_path
-    except Exception:
-        try:
-            if os.path.exists(target_path):
-                os.remove(target_path)
-        except Exception:
-            pass
-        return None
-
-
 def create_code_image(
     code: str,
     language: str = "python",
@@ -416,24 +350,17 @@ def create_code_image(
         
         # Get font details
         font_details = FONTS.get(font, FONTS["fira"])
-        fallback_font_name = font_details.get("fallback", "DejaVu Sans Mono")
-
-        # If the selected font doesn't support Hebrew, fallback when Hebrew exists in code.
-        if not font_details.get("supports_hebrew", True) and _contains_hebrew(code):
-            font_name = fallback_font_name
-        else:
-            font_name = fallback_font_name
-
-            # Prefer a local font file if available.
-            font_path = font_details.get("path")
-            if isinstance(font_path, str) and font_path and font_path != fallback_font_name:
-                if os.path.exists(font_path):
-                    font_name = font_path
-
-            # For downloadable fonts (e.g., EB Garamond), fetch and use cached TTF.
-            downloaded_font_path = _ensure_downloaded_font_file(font)
-            if downloaded_font_path:
-                font_name = downloaded_font_path
+        font_name = font_details.get("fallback", "DejaVu Sans Mono")
+        
+        # Try to use the specified font, fallback to DejaVu if not available
+        try:
+            if "path" in font_details and font_details["path"] != font_details["fallback"]:
+                # Test if font file exists
+                import os
+                if os.path.exists(font_details["path"]):
+                    font_name = font_details["path"]
+        except:
+            pass
         
         # Create formatter
         formatter = ImageFormatter(
